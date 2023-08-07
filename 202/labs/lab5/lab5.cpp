@@ -1,0 +1,55 @@
+/**************
+ * File: lab5.cpp
+ * The user creates this file to demonstrate use of a creature.
+ *************/
+
+#include <iostream>
+#include "Animal.h"
+using namespace std;
+
+int main() {
+  //**Student Requirement**
+  //Part 1: Create 2 animals by instantiating them
+  Animal animal1;
+  Animal animal2;
+
+  //**Student Requirement**
+  //Part 2: Set their values for species, age, and hostility (your choice)
+  animal1.SetSpecies("Toucan");
+  animal1.SetAge(23);
+  animal1.SetHostility(false);
+
+  animal2.SetSpecies("RatteBOI");
+  animal2.SetAge(5);
+  animal2.SetHostility(true);
+
+  //**Student Requirement**
+  //Part 3: Output their information. Species, age, and info if they are hostile
+  cout << "Data of animal1:\n";
+  cout << "\t\tThis Animal is a " << animal1.GetSpecies() << endl;
+  cout << "\t\tThis Animal is "<< animal1.Get_Age() << " years old" << endl;
+  if(animal1.IsHostile())
+    cout << "\t\tThis " << animal1.GetSpecies() << " IS hostile. Watch out!." << endl;
+  else
+    cout << "\t\tThis " << animal1.GetSpecies() << " is not hostile." << endl;
+  cout << "Data of animal2:\n";
+  cout << "\t\tThis Animal is a " << animal2.GetSpecies() << endl;
+  cout << "\t\tThis Animal is "<< animal2.Get_Age() << " years old" << endl;
+  if(animal2.IsHostile())
+    cout << "\t\tThis " << animal1.GetSpecies() << " IS hostile. Watch out!." << endl;
+  else
+    cout << "\t\tThis " << animal1.GetSpecies() << " is not hostile." << endl;
+  //**Student Requirement**
+  //Part 4: Modifying data members using custom function (make animals age)
+  //Display updated age
+  cout << "This " << animal1.GetSpecies() << " is now " << animal1.age() << " years old" << endl;
+  cout << "This " << animal2.GetSpecies() << " is now " << animal2.age() << " years old" << endl;
+
+  //**Student Requirement**
+  //Part 5: Call a custom function (make animals attack)
+  animal1.Attack();
+  animal2.Attack();
+
+  
+  return 0;
+}

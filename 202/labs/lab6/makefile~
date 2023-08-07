@@ -1,0 +1,6 @@
+CXX = g++
+CXXFLAGS = -Wall
+lab6: Homework.o lab6.cpp
+	$(CXX) $(CXXFLAGS) Homework.o lab6.cpp -o lab6
+Homework.o: Homework.cpp Homework.h
+	$(CXX) $(CXXFLAGS) -c Homework.cpp

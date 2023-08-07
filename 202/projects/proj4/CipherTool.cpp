@@ -1,0 +1,201 @@
+/*************************************************
+  File: CipherTool.cpp
+  Project: CMSC 202 Project 4, Spring 2020
+  Author: Denish Pasupuleti
+  Date: 4/20/2020
+  Section: 15
+  E-mail: mpasupu1@umbc.edu
+  Description: This is the cpp file for CipherTool.h which basically runs
+			   and maintains all the ciphers in m_ciphers and is the main
+			   driver for proj4
+*************************************************/
+
+
+#include "CipherTool.h"
+#include <iostream>
+using namespace std;
+
+// Name: CipherTool Constructor
+// Desc - Creates a new CipherTool and sets m_filename based on string passed
+CipherTool::CipherTool(string fileName) {
+  m_filename = fileName;
+}
+// Name: CipherTool Destructor
+//Desc - Calls destructor for all ciphers in m_ciphers
+CipherTool::~CipherTool() {
+  for (unsigned int i = 0; i < m_ciphers.size(); i++)
+    delete m_ciphers[i];
+  for (unsigned int i = 0; i < m_ciphers.size(); i++)
+    m_ciphers[i] = nullptr;
+}
+
+// LoadFile
+// Desc - Opens file and reads in each Cipher. Each Cipher dynamically allocated
+// and put into m_ciphers
+void CipherTool::LoadFile() {
+  ifstream file;
+  file.open(m_filename);
+  char cipherType;
+  while(file >> cipherType)
+    {
+      int shift;
+      string key = "", message = "";
+      //char cipherType;
+      bool isEncrypted;
+      
+      // c or v or o
+      file.ignore(256, '|');
+      // 0 or 1
+      file >> isEncrypted;
+      file.ignore(256, '|');
+      // message
+      getline(file, message, '|');
+      // caesar needs shift, vignere needs key
+      // adds ciphers to vector
+      if (cipherType == 'c')
+	{
+	  file >> shift;
+	  file.ignore(256, '\n');
+	  Caesar* cipherC = new Caesar(message, isEncrypted, shift);
+	  m_ciphers.push_back(cipherC);
+	}
+      else if (cipherType == 'v')
+	{
+	  getline(file, key, '\n');
+	  Vigenere* cipherV = new Vigenere(message, isEncrypted, key);
+	  m_ciphers.push_back(cipherV);
+	}
+      else
+	{
+	  file.ignore(256, '\n');
+	  Ong* cipherO = new Ong(message, isEncrypted);
+	  m_ciphers.push_back(cipherO);
+	}
+    }
+  file.close();
+}
+
+// DisplayCiphers
+// Desc - Displays each of the ciphers in the m_ciphers
+void CipherTool::DisplayCiphers() {
+  for (unsigned int i = 0; i < m_ciphers.size(); i++)
+    cout << i+1 << ". "<< *m_ciphers[i] << endl;
+}
+
+// EncryptDecrypt
+// Desc - Encrypts or decrypts each of the ciphers in the m_ciphers
+void CipherTool::EncryptDecrypt(bool encrypted) {
+  
+  if (encrypted == false)
+    {
+      int count = 0;
+      for (unsigned int i = 0; i < m_ciphers.size(); i++)
+	{
+	  //validation
+	  if (m_ciphers[i]->GetIsEncrypted() == false)
+	    {
+	      m_ciphers[i]->Encrypt();
+	      count ++;
+	    }
+	}
+      if(count == 0)
+	cout << "All ciphers are already encrypted" << endl;
+      else
+	cout << count << " ciphers Encrypted" << endl;
+    }
+  else
+    {
+      int count = 0;
+      for (unsigned int x = 0; x < m_ciphers.size(); x++)
+	{
+	  //validation
+	  if (m_ciphers[x]->GetIsEncrypted() == true)
+	    {
+	      m_ciphers[x]->Decrypt();
+	      count++;
+	    }
+	}
+      if(count == 0)
+	cout << "All ciphers are already decrypted" << endl;
+      else
+	cout << count << " ciphers Decrypted" << endl;
+    }
+}
+
+// Export
+// Desc - Exports each of the ciphers in the m_ciphers (so they can be reused)
+void CipherTool::Export() {
+  cout << "Goes into export file" << endl;
+  string fileName;
+  cout << "What would you like to call the export file?" << endl;
+  cin >> fileName;
+  
+  ofstream outFile;
+  outFile.open(fileName);
+  //writing to file
+  for (unsigned int i = 0; i < m_ciphers.size(); i++)
+      outFile << m_ciphers[i]->FormatOutput() << endl;
+  outFile.close();
+  cout << m_ciphers.size() << " ciphers exported" << endl;
+}
+
+// Menu
+// Desc - Displays menu and returns choice
+int CipherTool::Menu() {
+  int choice;
+  cout << "What would you like to do?" << endl;
+  cout << "1. Display All Ciphers" << endl;
+  cout << "2. Encrypt All Ciphers" << endl;
+  cout << "3. Decrypt All Ciphers" << endl;
+  cout << "4. Export All Ciphers" << endl;
+  cout << "5. Quit" << endl;
+  cin >> choice;
+  //input validation
+  while (choice < 1 or choice > 5)
+    {
+      cout << "Invalid Input. Please try again." << endl;
+      cin.clear();
+      cin >> choice;
+    }
+  cout << "" << endl;
+  return choice;
+}
+
+//GetType
+// Desc - Pass it a cipher and it returns the char of the subtype
+char CipherTool::GetType(Cipher* cipher) {
+  string type = cipher->ToString();
+  return type[0];
+}
+
+//Start
+// Desc - Loads input file, allows user to choose what to do
+void CipherTool::Start() {
+  LoadFile();
+  int choice;
+  //program loop
+  do
+    {
+      choice = Menu();
+      switch(choice)
+	{
+	case 1:
+	  DisplayCiphers();
+	  break;
+	case 2:
+	  EncryptDecrypt(false);
+	  break;
+	case 3:
+	  EncryptDecrypt(true);
+	  break;
+	case 4:
+	  Export();
+	  break;
+	case 5:
+	  cout << "Thanks for using UMBC Encryption" << endl;
+	  break;
+	default: return;
+	}
+
+    }while(choice != 5);
+}

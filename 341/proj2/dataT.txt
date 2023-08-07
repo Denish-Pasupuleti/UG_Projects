@@ -1,0 +1,36 @@
+ban<=>
+author a<=>
+apple ally
+<==>
+gas<=>
+author b<=>
+gas gus
+<==>
+the<=>
+author c<=>
+rat lion elephant
+<==>
+bigg<=>
+author d<=>
+big bigger biggest
+<==>
+buy<=>
+author d<=>
+busy boy buyer
+<==>
+whos<=>
+author d<=>
+what when
+<==>
+later<=>
+author d<=>
+late ate
+<==>
+apple<=>
+author d<=>
+banana orange
+<==>
+juice<=>
+author d<=>
+milkshake smoothy
+<==>

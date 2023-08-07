@@ -1,0 +1,33 @@
+     1                                  ; random number generator subroutine
+     2                                  
+     3                                    section.text
+     3          ******************       warning: label alone on a line without a colon might be in error [-w+orphan-labels]
+     4                                  
+     5                                    global rand_num
+     6                                  
+     7                                  rand_num:
+     8                                    ; sets up seed
+     9 00000000 4831C0                    xor rax, rax
+    10 00000003 480FC7F0                  RDRAND rax
+    11                                  
+    12                                    ; mul by 1103515245 and add 12345
+    13 00000007 4889C3                    mov rbx, rax      
+    14 0000000A 4869DB6D4EC641            imul rbx, 1103515245
+    15 00000011 4881C339300000            add rbx, 12345
+    16                                  
+    17                                    ; dividing by 65536
+    18 00000018 4889D8                    mov rax, rbx
+    19 0000001B 4831D2                    xor rdx, rdx 
+    20 0000001E B900000100                mov rcx, 65536
+    21 00000023 48F7F1                    div rcx  
+    22                                  
+    23                                    ; have to mod by 17
+    24 00000026 31C9                      xor ecx, ecx
+    25 00000028 31D2                      xor edx, edx
+    26 0000002A B911000000                mov ecx, 17 
+    27 0000002F F7F1                      div ecx
+    28 00000031 89D0                      mov eax, edx
+    29 00000033 C3                        ret
+    30                                  
+    31                                  
+    32                                  

@@ -1,0 +1,222 @@
+/*
+ * File: proj1.cpp
+ * Project: CMSC 202 Project 1, Spring 2020
+ * Author: Denish Pasupuleti
+ * Date: 02/15/19
+ * Section: 15
+ * E-mail: mpasupu1@umbc.edu
+ *
+ * This program lets you play a game of Fifteen puzzle but either loading
+ * in or selecting a default board. The fifteen (15 or 16 puzzle) is a
+ * common sliding puzzle that you may remember from your youth.
+ * It involves a frame of numbered square tiles in random order
+ * with one tile missing. The object of the puzzle is to place the
+ * tiles in order by making sliding moves that use the empty space.
+ */
+#include <iostream>
+#include <fstream>
+#include <iomanip>
+using namespace std;
+
+//constants
+const int A_SIZE = 4;
+const int DEFAULT[A_SIZE][A_SIZE] = {{1,2,3,4},
+                                     {5,6,7,8},
+                                     {9,10,11,12},
+                                     {13,14,0,15}};
+const int CHECK[A_SIZE][A_SIZE] = {{1,2,3,4},
+                                   {5,6,7,8},
+                                   {9,10,11,12},
+                                   {13,14,15,0}};
+
+/*
+ * prompt
+ * preCondition: None
+ * PostCondition: gets row, col from user
+ */
+void prompt(int &row, int &col);
+
+/*
+ * swap
+ * PreCondition: coordinates have been validated and direction been computed
+ * PostCondition: swaps the tile with user input
+ */
+bool swap(int board[A_SIZE][A_SIZE], int coord1, int coord2);
+
+/*
+ * playGame
+ * PreCondition: N/A
+ * PostCondition: Plays game, displays winner, asks to play again
+ */
+void playGame();
+
+/*
+ * winner
+ * PreCondition: board is passed in
+ * PostCondition: returns true if board is finished
+ */
+bool winner(int board[A_SIZE][A_SIZE]);
+
+/*
+ * printBoard
+ * PreCondition: board has been passed in
+ * PostCondition: displays board
+ */
+void printBoard(int board[A_SIZE][A_SIZE]);
+
+int main(){
+    playGame();
+}
+
+void printBoard(int board[A_SIZE][A_SIZE]){
+    //prints board
+    cout << "    1   2   3   4" << endl;
+    for(int i = 0; i < A_SIZE; i++){
+        cout << i+1 << "|" << setw(3);
+        for(int j = 0; j < A_SIZE; j++)
+            cout << board[i][j] << "|"<< setw(3);
+        cout << "\n" << endl;
+    }
+}
+
+bool winner(int board[A_SIZE][A_SIZE]) {
+    //determines win if the comp board matches the check board
+    bool win = false;
+    for(int i = 0; i < A_SIZE; i++){
+        for(int j = 0; j < A_SIZE; j++){
+            win = board[i][j] == CHECK[i][j] and board[i][j - 1] == 15;
+        }
+    }
+    return win;
+}
+
+bool swap(int board[A_SIZE][A_SIZE], int coord1, int coord2){
+    int num = 0;
+    if(board[coord1][coord2-1] == 0 and coord1 >= 0 and coord2-1 >= 0)
+        num = 1;
+    else if(board[coord1][coord2+1] == 0 and coord1 >= 0 and coord2+1 >= 0)
+        num = 2;
+    else if(board[coord1-1][coord2] == 0 and coord1-1 >= 0 and coord2 >= 0)
+        num = 3;
+    else if(board[coord1+1][coord2] == 0 and coord1+1 >= 0 and coord2 >= 0)
+        num = 4;
+    else
+        num = 0;
+
+    //uses switch statements to slide up, down, left, right
+    switch(num) {
+        //RIGHT
+        case 1:
+            board[coord1][coord2-1] = board[coord1][coord2];
+            board[coord1][coord2] = 0;
+            cout << "CASE 1: TILE SLID RIGHT" << endl;
+            return true;
+            break;
+            //LEFT
+        case 2:
+            board[coord1][coord2+1] = board[coord1][coord2];
+            board[coord1][coord2] = 0;
+            cout << "CASE 2: TILE SLID LEFT" << endl;
+            return true;
+            break;
+            //DOWN
+        case 3:
+            board[coord1-1][coord2] = board[coord1][coord2];
+            board[coord1][coord2] = 0;
+            cout << "CASE 3: TILE SLID DOWN" << endl;
+            return true;
+            break;
+            //UP
+        case 4:
+            board[coord1+1][coord2] = board[coord1][coord2];
+            board[coord1][coord2] = 0;
+            cout << "CASE 4: TILE SLID UP" << endl;
+            return true;
+            break;
+        default:
+            return false;
+    }
+}
+
+void prompt(int &row, int &col){
+    cout << "What is the row (left) and column (top) to slide" << endl;
+    cin >> row >> col;
+    cout << "ROW: " << row << " " << "COLUMN: " << col << endl;
+}
+
+void playGame(){
+    //main play game function which starts the game
+    cout << "Welcome to the Fifteen Game" << endl;
+    int type = 0;
+    //gets the type of board player wants to choose
+    cout << "Would you like to load a board? \n1. Yes\n2. No" << endl;
+    cin >> type;
+    //input validation
+    while(cin.fail() or type < 1 or type > 2){
+        cout << "Please choose 1 or 2." << endl;
+        cin.clear();
+        cin >> type;
+    }
+    int board[A_SIZE][A_SIZE];
+    if(type == 2){
+        cout << "Loading default" << endl;
+        for(int i = 0; i < A_SIZE; i++){
+            for(int j = 0; j < A_SIZE; j++){
+                board[i][j] = DEFAULT[i][j];
+            }
+        }
+    }
+    if(type == 1){
+        //set board to board loaded from file
+        char file[80];
+        //getting file name
+        cout << "What is the file name? " << endl;
+        cin >> file;
+        //getting file
+        ifstream inputStream;
+        inputStream.open(file);
+        for(int x = 0; x < A_SIZE; x++){
+            for(int y = 0; y < A_SIZE; y++){
+                inputStream >> board[x][y];
+            }
+        }
+    }
+    printBoard(board);
+    while(!winner(board)) {
+        int row = 0, col = 0;
+        prompt(row, col);
+        do {
+            if ((row >= 1 and col >= 1) and (row <= 4 and col <= 4) and board[row - 1][col - 1] == 0){
+                cout << "You chose a blank" << endl;
+                cout << "Tile cannot be slid" << endl;
+                printBoard(board);
+                cin.clear();
+                prompt(row, col);
+            }
+            else if (row > A_SIZE or row < 1 or col > A_SIZE or col < 1){
+                cout << "Coordinates out of bounds" << endl;
+                printBoard(board);
+                cin.clear();
+                prompt(row, col);
+            }
+        }while((row > A_SIZE or row < 1 or col > A_SIZE or col < 1) or (board[row - 1][col - 1] == 0));
+        while (swap(board, row-1, col-1) == false){
+            cout << "This is invalid. Please choose again" << endl;
+            printBoard(board);
+            cin.clear();
+            prompt(row, col);
+        }
+        printBoard(board);
+        cout << ( !winner(board) ? "No winner" : "") << endl;
+    }
+    cout << "Congrats you've won!" << endl;
+    char again[80];
+    cout << "Play again? (y/n)" << endl;
+    cin >> again;
+    if(again[0] == 'n')
+        cout << "Thank you for playing the game of fifteen!" << endl;
+    if(again[0] == 'y')
+        playGame();
+}
+
+

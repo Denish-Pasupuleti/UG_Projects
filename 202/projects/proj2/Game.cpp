@@ -1,0 +1,203 @@
+#include "Material.h"
+#include "Game.h"
+#include <iostream>
+#include <fstream>
+#include <cstdlib>
+#include <string>
+//#include <"Diver.h">
+using namespace std;
+
+const string UNIQUE = "unique";
+const string RAW = "raw";
+
+Game::Game(){
+    string name;
+    GameTitle();
+    LoadMaterials();
+    cout << "What is the name of your diver? " << endl;
+    getline(cin, name);
+    cin.clear();
+    m_myDiver.SetName(name);
+    cout << "" << endl;
+}
+
+void Game::LoadMaterials(){
+    //uses ifstream to open proj2_data.txt
+    ifstream file;
+    file.open(PROJ2_DATA);
+    for(int i = 0; i < PROJ2_SIZE; i++){
+        string name, type, m1, m2
+	  int quant = 0, depth;
+	//getline to read in name, type, material1, material 2, depth
+	//since depth will be in string form atoi will convert to int
+        getline(file, name, ',');
+        getline(file, type, ',');
+        getline(file, m1, ',');
+        getline(file, m2, ',');
+	file >> depth;
+        file.ignore(256, '\n');
+        m_materials[i] = Material(name, type, m1, m2, quant, depth);
+	//adds material objects to diver materials
+	m_myDiver.AddMaterial(m_materials[i]);
+    }
+    cin.clear();
+    cout << PROJ2_SIZE << " materials loaded." << endl;
+}
+
+void Game::StartGame(){
+    int option;
+    bool gameOver = false;
+    //switch statement for options based on MainMenu()
+    do{
+        option = MainMenu();
+	switch(option){
+	case 1:
+	  DisplayMaterials();
+	  cout << "" << endl;
+	  break;
+	case 2:
+	  SearchMaterials();
+	  cout << "" << endl;
+	  break;
+	case 3:
+	  CombineMaterials();
+	  cout << "" << endl;
+	  break;
+	case 4:
+	  CalcScore();
+	  cout << "" << endl;
+	  break;
+	case 5:
+	  gameOver = true;
+	  cout << "" << endl;
+	  break;
+	default:
+	  break;
+	}
+	//if max depth is reach; ends game
+	if(m_myDiver.CalcDepth() >= MAX_DEPTH){
+	  gameOver = true;
+	  cout << "Yay! you've won" << endl;
+	}
+    }while(gameOver == false);
+    cout << "Thank you for playing Subnautica!" << endl;
+}
+
+void Game::DisplayMaterials(){
+  m_myDiver.DisplayMaterials();
+}
+
+int Game::MainMenu(){
+    //gets option choice from user
+    int opt;
+    cin.clear();
+    cout << "What would you like to do?\n"
+            "1. Display your Diver's Materials\n"
+            "2. Search for Raw Materials\n"
+            "3. Attempt to Merge Materials\n"
+            "4. See Score\n"
+            "5. quit" << endl;
+    cin >> opt;
+    return opt;
+}
+
+void Game::SearchMaterials() {
+    //uses srand for random number between 0 and 49 inclusive
+    int random = rand() % PROJ2_SIZE-1;
+    //check if material at location random is raw 
+    while(m_materials[random].m_type != RAW)
+      random = rand() % PROJ2_SIZE;
+    //randomly finds an element and adds it to m_materials
+    cout << m_materials[random].m_name << " found!" << endl;
+    m_myDiver.IncrementQuantity(m_materials[random]);
+}
+
+void Game::CombineMaterials(){
+    int mat1, mat2, mat1Index, mat2Index;
+    //gets index of materials that user wants to merge
+    RequestMaterial(mat1);
+    RequestMaterial(mat2);
+    //gets index of requested material
+    mat1Index = m_myDiver.CheckMaterial(m_materials[mat1]);
+    mat2Index = m_myDiver.CheckMaterial(m_materials[mat2]);
+    //checks if material exists and that a recipe for it exists
+    //also checks the quantity of the materials
+    if((mat1Index != -1 or mat2Index != -1)
+        and SearchRecipes(m_materials[mat1].m_name, m_materials[mat2].m_name) != 1
+        and m_myDiver.CheckQuantity(m_materials[mat1], m_materials[mat2]) != false)
+    {
+        //nMat is a new material that is made by combining mat1 and mat2
+        Material nMat = m_materials[SearchRecipes(m_materials[mat1].m_name,
+						  m_materials[mat2].m_name)];
+	//checks if there is a unique already
+        if(m_myDiver.CheckMaterial(nMat) != 1 and nMat.m_type == UNIQUE){
+            cout << "You already have a " << nMat.m_name << endl;
+        }
+        else{
+	    //increment new mat and decrement mat and mat2
+            m_myDiver.IncrementQuantity(nMat);
+            m_myDiver.DecrementQuantity(m_materials[mat1]);
+            m_myDiver.DecrementQuantity(m_materials[mat2]);
+
+            cout << m_materials[mat1].m_name << " combined with "
+            << m_materials[mat2].m_name << " to make " << nMat.m_name << "!" << endl;
+        }
+    }
+    else if(SearchRecipes(m_materials[mat1].m_name, m_materials[mat2].m_name) == -1){
+      //materials cannot be merged
+      cout << "You can not merge " << m_materials[mat1].m_name << " and "
+	   << m_materials[mat2].m_name << " together" << endl;
+    }
+    else{
+        //not enough material
+        cout << "You do not have enough " << m_materials[mat1].m_name << " or "
+        << m_materials[mat2].m_name << " to attempt that merge" << endl;
+    }
+
+
+}
+
+void Game::RequestMaterial(int &choice){
+    //User inputs the index of material they want to merge
+    int option = 0;
+
+    cout << "Which materials would you like to merge?\n"
+      "To list known materials, enter -1" << endl;
+    if(option == -1)
+      DisplayMaterials();
+    else
+      {
+	while(option > PROJ2_SIZE or option < 0)
+	  {
+	    cin.clear();
+	    cout << "Which materials would you like to merge?\n"
+	      "To list known materials, enter -1" << endl;
+	    cin >> option;
+	  }
+	choice = option -1;
+      }
+    
+}
+
+int Game::SearchRecipes(string mat1, string mat2){
+    //searches for all possible recipes that include mat1 and mat2
+    for(int i = 0; i < PROJ2_SIZE; i++)
+    {
+        if(m_materials[i].m_type != RAW
+        and ((m_materials[i].m_material1) == mat1 and
+	     m_materials[i].m_material2 == mat2))
+            return i;
+        if(m_materials[i].m_material1 == mat2 and m_materials[i].m_material1 == mat1)
+            return i;
+    }
+    return -1;
+
+}
+
+void Game::CalcScore(){
+    //calculates depth of diver
+    cout << "***The Diver***\n"
+            "The Great Diver " << m_myDiver.GetName() <<
+            "\nMaximum Depth: " << MAX_DEPTH <<
+            "\nCurrent Depth: " << m_myDiver.CalcDepth() << endl;
+}

@@ -1,0 +1,61 @@
+"""
+File:    design3.txt
+Author:  Denish Pasupuleti
+Date:    11/29/19
+Section: 34
+E-mail:  mpasupu1@umbc.edu
+Description:
+  Design file for proj3
+"""
+
+
+def get_board():
+     """
+    This function gets the inital board
+    :return: 2d list board
+    """
+    # ask user for file name
+    # open file
+    # append lines to a list
+    return the list
+    return board
+
+
+def paint_board(board):
+    """
+    This function will recursively paint the board
+    with the owner of each tile
+    :param board: game board
+    :return: recursion so it will call on it's self until all tiles have
+    been painted
+    """
+    # base case to check if the board is filled
+    # recursion case which will have updated board for the parameter
+    # will also call remove to update the current board
+    # once done will call on count and display scores
+
+
+def remove(board):
+    """
+    This function will remove the top element of the board
+    :param board: 2d list game board
+    :return: none, will just update the game board
+    """
+    # will remove whatever is in position [0][0]
+
+
+def count(board):
+    """
+    This function will count each tile for respective owners
+
+    :param board: 2d list game board
+    :return: Will return count of how many per player
+    """
+    # once the board has been painted this function will run
+    # go through each tile and count for respective player
+    # return a list consisting of 2 numbers corresponding to players
+
+
+if __name__ == "__main__":
+    # will call on paint_board(get_board())
+

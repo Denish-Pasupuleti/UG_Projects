@@ -1,0 +1,129 @@
+"""
+File:    design1.txt
+Author:  Denish Pasupuleti
+Date:    10/15/19
+Section: 34
+E-mail:  mpasupu1@umbc.edu
+Description:
+         You are implementing an exciting new baking sim!
+         First players will go to the grocery store and purchase ingredients
+         for baking baguettes, macarons, and croissants.
+         If they fail to stay within their budget or
+         fail to purchase enough ingredients, they LOSE!
+
+         If they are successful at purchasing ingredients,
+         then they are then returned to the kitchen where they chose what items to work on.
+         They must begin the baguette dough before working on the macarons and croissants,
+         and they must finish every other task before baking the baguettes.
+"""
+
+STARTING_FUNDS = 80.0
+
+# costs for ingredients
+FLOUR_COST_PER_BAG = 2.5
+EGGS_COST_PER_CRATE = 1.9
+YEAST_COST_PER_BAG = 3.25
+BUTTER_COST_PER_PACK = 1.25
+MILK_COST_PER_JUG = 2.75
+GALLONS_MILK_PER_JUG = 1.0
+
+# ingredients per x
+EGGS_PER_CRATE = 24.0
+TBSP_BUTTER_PER_PACK = 64.0
+CUPS_FLOUR_PER_BAG = 25.0
+CUP_YEAST_PER_BAG = 6.0
+
+# required
+FLOUR_REQUIRED = 48.0 + 112.5
+EGGS_REQUIRED = 12.0 + 60.0
+BUTTER_REQUIRED = 144.0
+YEAST_REQUIRED = 39 + 50
+MILK_REQUIRED = 18.0
+
+# measurements
+CUPS_IN_GALLON = 16
+TSP_IN_CUP = 48
+
+[add more constants here]
+
+def go_shopping():
+    """
+    go shopping function is the very beginning of the program where the user
+    will be asked to buy x ingredient and y amount of it.If the user still
+    has money the program will continue else it will output that they ran
+    out of money
+    :return: shopping cart if user did not run out of money
+    """
+    money = STARTING_FUNDS
+    shopping_cart = []
+    looping through each ingredient
+        prompt the user to buy each ingredient
+        also calculate cost based on already
+        bought ingredients once the loop starts
+        money -= cost of ingredient
+        if money > 80
+            print "you have run out of money"
+            return
+        else
+            if milk
+                add the amount to the shopping cart by:
+                purchased amount * CUPS_IN_GALLON(UNITS)
+            elif yeast
+                add the amount to the shopping cart by:
+                purchased amount * CUP_YEAST_PER_BAG * TSP_IN_CUP
+            elif
+                Ingredients still required are Flour,Eggs,Butter
+                keep asking until all ingredients are acquired or the user quits
+
+def check_items_enough(shopping_cart):
+    """
+    check_items_enough(shopping_cart) function is for checking that
+    every ingredient in the cart has sufficient amounts to start baking
+    :param shopping_cart:
+    :return: FALSE if there aren't enough ingredients (SEE REQUIRED INGREDIENT AMOUNTS)
+    """
+    met = True
+    for each ingredient
+        if ingredient amount < required (SEE REQUIRED INGREDIENT AMOUNTS)
+            met = False
+            print the ingredient that's missing and the amount missing
+    return met
+
+def print_task_list(tasks_remaining):
+    """
+    print_task_list(tasks_remaining) function just prints out
+    each talk that is remaining
+    :param tasks_remaining:
+    :return:
+    """
+    for each task
+        print task
+
+def is_valid_input(index, tasks):
+    """
+    is_valid_input(index, tasks) function will simply output True or False
+    based on the index and length of tasks given
+    :param index:
+    :param tasks:
+    :return: if index is within the length of tasks provided
+    """
+
+def bake():
+    """
+    bake function will check if you have enough amounts of ingredients and
+    starts looping through every task else it criticizes the user
+    :return:
+    """
+    check if you have enough ingredients
+    if yes
+        start looping through every task with baguette dough FIRST
+        and baking baguettes is LAST  (SEQUENCE)
+    else
+        criticize the user until he loses hope
+
+if __name__ == '__main__':
+    create a shopping cart list
+    create a tasks list
+
+    go shopping
+    go baking

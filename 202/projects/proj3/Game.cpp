@@ -1,0 +1,251 @@
+/*************************************************
+  File: Game.cpp
+  Project: CMSC 202 Project 3, Spring 2020
+  Author: Denish Pasupuleti
+  Date: 3/20/2020
+  Section: 15
+  E-mail: mpasupu1@umbc.edu
+  Description: This is the cpp file for Game.h and this program basically
+               runs and manages the game portion of the project. 
+*************************************************/
+
+#include "Game.h"
+#include <fstream>
+#include <iostream>
+#include <string>
+#include <cstdlib>
+
+using namespace std;
+
+//constants
+const int dexSize = 151;
+
+//Creates a new game and sets m_filename based on string passed
+Game::Game(string file)
+{
+  m_filename = file;
+  //dynamically allocating
+  m_list = new PokemonList();
+  m_userPocket = new PokemonList();
+  m_enemyPocket = new PokemonList();
+}
+
+//Calls destructor for all linked lists in game
+Game::~Game()
+{
+  //deletes
+  delete m_list;
+  delete m_userPocket;
+  delete m_enemyPocket;
+  //resets
+  m_list = nullptr;
+  m_userPocket = nullptr;
+  m_enemyPocket = nullptr;
+}
+
+//Opens file and reads in each Pokemon.
+//And puts into m_list
+void Game::LoadFile()
+{
+  ifstream file;
+  file.open(m_filename);
+  //use getline and loop to load in pokemon
+  //create a new pokemon using loaded values
+  //pass that pokemon into InsertEnd and work on InsertEnd to add at the end
+  for (int i = 0; i < dexSize; i++)
+    {      
+      int index;
+      string name, type, typeStrong;
+      //getline
+      file >> index;
+      file.ignore(256, ',');
+      getline(file, name, ',');
+      getline(file, type, ',');
+      getline(file, typeStrong, '\n');
+      //creates Pokemon
+      Pokemon* pokemon = new Pokemon(index, name, type, typeStrong);
+      //adds to m_list
+      m_list->InsertEnd(pokemon);
+    }
+  cin.clear();
+  file.close();
+}
+
+//Allows user to choose team and populates m_userPocket
+void Game::ChooseTeam()
+{
+  int choice, count = 5;
+  for (int x = 0; x < 5; x++)
+    {
+      cout << "Here is a list of Pokemon you can choose from: " << endl;
+      cout << "---------------------------------------" << endl;
+      m_list->Display();
+      cout << "---------------------------------------" << endl;
+      cout << "Pick a pokemon by entering the index (" 
+	   << count << " left)" << endl;
+      cin >> choice;
+      while (choice < 1 or choice > 151 or !(m_list->Exist(choice)))
+	{
+	  cin.clear();
+	  cout << "Pick a valid index (" << count << " left)" << endl;
+	  cin >> choice;
+	}
+      count--;
+      
+      //adds to m_userPocket
+      m_list->Transfer(choice, m_userPocket);
+      cin.clear();
+    }
+  cin.clear();
+  cout << "---------------------------------------" << endl;
+}
+
+//Displays menu and returns choice
+int Game::Menu()
+{
+  int choice;
+  cout << "Menu :" << endl;
+  cout << "1. Attack" << endl;
+  cout << "2. Swap" << endl;
+  cout << "3. Forfeit" << endl;
+  cout << "---------------------------------------" << endl;
+  cin >> choice;
+
+  //validation
+  while (choice < 1 or choice > 3)
+    {
+      cin.clear();
+      cout << "Invalid menu choice. Please try again." << endl;
+      cin >> choice;
+    }
+  return choice;
+}
+
+// Desc - Manages the battle between m_userPocket and m_enemyPocket.
+// Displays both the m_userPocket and m_enemyPocket
+// For each round, makes sure each team has Pokemon. Makes Pokemon in head fight.
+// Indicates if the round yields user win, enemy win, and if a pokemon was switched
+// Fights continue until there are no remaining Pokemon in one of the lists
+int Game::Battle()
+{
+  int round = 1, menuOption;
+  cout << "Print Player Pocket" << endl;
+  m_userPocket->Display();
+  cout << "---------------------------------------" << endl;
+  cout << "Print cput Pocket" << endl;
+  m_enemyPocket->Display();
+  cout << "---------------------------------------" << endl;
+
+  while (m_userPocket != nullptr or m_enemyPocket != nullptr)
+    {
+      cout << "Round " << round << ":" << endl;
+      //de-references pokemon
+      //displays user and cpu pocket head pokemon
+      cout << "CPU's Pockemon:" << *m_enemyPocket->GetHead();
+      cout << "Your Pokemon:" << *m_userPocket->GetHead();
+      cout << "---------------------------------------" << endl;
+
+      menuOption = Menu();
+      //forfeit
+      if(menuOption == 3)
+	return 2;
+      //swap pokemon
+      if (menuOption == 2)
+	{
+	  m_userPocket->SwapPokemon();
+	  round++;
+	}
+      //Attack
+      else if (menuOption == 1)
+	{
+	  //health origina;
+	  int userHealth = m_userPocket->GetHead()->GetHealth();
+	  int enemyHealth = m_enemyPocket->GetHead()->GetHealth();
+
+	  //return value from Attack()
+	  int option = m_userPocket->Attack(m_enemyPocket);
+	  
+	  //health after attack
+	  int uCurrH = m_userPocket->GetHead()->GetHealth();
+	  int eCurrH = m_enemyPocket->GetHead()->GetHealth();
+
+	  cout << "" << endl;
+	  
+	  //check
+	  if (enemyHealth - eCurrH > 0)
+	    cout << "Cpu's pokemon took " << enemyHealth - eCurrH
+		 << " damage" << endl;
+	  //check
+	  if (userHealth - uCurrH != 0)
+	    cout << "Your pokemon took " << userHealth - uCurrH
+		 << " damage" << endl;
+	  //if user pokemon died
+	  if (option == 1)
+	    {
+	      cout << "Your Pokemon has been defeated" << endl;
+	      if(m_userPocket->GetSize() == 2)
+		cout << "THIS IS YOUR LAST POKEMON!!!" << endl;
+	      if (m_userPocket->GetSize() != 0)
+		{
+		  m_userPocket->Remove(m_userPocket->GetHead()->GetIndex());
+		  if (m_userPocket->GetSize() != 0)
+		    {
+		      m_userPocket->SwapPokemon();
+		      if(m_userPocket->GetSize() != 1)
+			cout << "You changed your pokemon to:"
+			     << *m_userPocket->GetHead() << endl;
+		    }
+		  else
+		    return 2;
+		}
+	    }
+	  //if enemt pokemon died
+	  else if (option == 2)
+	    {
+	      m_enemyPocket->Remove(m_enemyPocket->GetHead()->GetIndex());
+	      cout << "CPU's Pokemon has been Defeated" << endl;
+	      if (m_enemyPocket != nullptr)
+		cout << "CPU changed your pokemon to:"
+		     << *m_enemyPocket->GetHead() << endl;
+	      else
+		return 1;
+	    }
+	  //just goes to next round
+	  round++;
+	  cout << "---------------------------------------" << endl;
+	}
+    }
+  if (m_userPocket == nullptr)
+    return 2;
+  else if (m_enemyPocket == nullptr)
+    return 1;
+  else
+    return 0;
+}
+
+//Loads input file, allows user to choose their team, randomly populates the
+//m_enemyPocket with remaining Pokemon and returns the result of the battle
+int Game::Start()
+{
+  //loads all pokemon into m_list
+  LoadFile();
+  //choose user pocket
+  ChooseTeam();
+  //chooses cpu pocket
+  cin.clear();
+  //randomly populates enemy pocket
+  srand((int)time(0));
+  for (int i = 0; i < 5; i++)
+    {
+      int random = (rand() % 151) + 1;
+      //check if pokemon is valid
+      while (!(m_list->Exist(random)))
+	{
+	  random = (rand() % 151) + 1;
+	}
+      cin.clear();
+      //transfers
+      m_list->Transfer(random, m_enemyPocket);
+    }
+  return Battle();
+}

@@ -1,0 +1,106 @@
+"""
+File:    design2.txt
+Author:  Denish Pasupuleti
+Date:    Oct 31 2019
+Section: 34
+E-mail:  mpasupu1@umbc.edu
+Description: Design file for project 2 sim game
+"""
+
+def play():
+    """
+    Starts the game
+    :Returns loser
+    ""
+    player one lines = []
+    player two lines = []
+    p1_symbol = get input from player
+    p2_symbol = get input from player
+    player_turn = 1
+    print_board(p1_lines, p1_symbol, p2_lines, p2_symbol)
+
+    while not game over(p1_lines, p2_lines)
+        if player_turn == 1:
+            append lines to list p1_lines
+            player_turn = 2
+        else:
+            append lines to list p2_lines
+            player_turn = 1
+        print_board(p1_lines, p1_symbol, p2_lines, p2_symbol)
+
+    if check_triangle(p1_lines):
+        return 2
+    else:
+        return 1
+
+
+def get_coordinates(player):
+    """
+    prompts for two points
+
+    :param player: which player is playing
+    :returns: list in which the coordinates are in [x,y]
+    """
+    line = int(input("Enter a line for player" + str(player) + ": ")
+    line.strip().split()
+    line[0] = int(line[0])
+    line[1] = int(line[1])
+    return line
+
+
+def is_valid_coord(line list, player(number)):
+    """
+    Return the pair of lines if valid
+
+    :param line list: ALREADY connected lines
+    :param player: player number 1  or 2
+    :returns: coordinates in form of [x,y]
+    """
+    player_lines = get_coordinates(player)
+    while check_coordinates(player_lines, line list):
+        player_lines = get_coordinates(player)
+    return player_lines
+
+
+def check_triangle(list lines)
+    """
+    checks the matrix for any 3 values that make a triangle
+
+    :param list lines: player lines
+    :returns: Boolean  where there is a triangle or not
+    """
+    make adjacency matrix
+    3 for loops to check each vertices with edges
+    because of 3 points there needs to be variables checked
+    matrix[x][y] == 1 and matrix[x][y] == matrix[y][z] == matrix[z][x]
+        return True
+    else:
+        because no triangle was detected
+        return False
+
+
+def game_over():
+    """
+    checks if there is a triangle connection between points
+
+    :returns: Boolean if there is a connection
+    """
+    if check_triangle in p1_lines or p2_lines
+        return True
+    else:
+        return False
+
+
+def won(player):
+    """
+    prints out which player lost
+
+    :param player: which player 1 or 2
+    if player == 1:
+        print("Game over. player 1 loses.")
+    if player == 2:
+        print("Game over. player 2 loses.")
+
+
+if __name__ == "__main__":
+    won(play())

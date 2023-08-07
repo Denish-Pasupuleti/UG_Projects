@@ -1,0 +1,64 @@
+/*************************************************
+  File: Cipher.cpp
+  Project: CMSC 202 Project 4, Spring 2020
+  Author: Denish Pasupuleti
+  Date: 4/20/2020
+  Section: 15
+  E-mail: mpasupu1@umbc.edu
+  Description: This is the cpp file for Cipher.h which is the parent
+			   class for all cipher types in this project(Caesar, Vigenere, Ong).
+			   Getter and Setter methods for member variables and ease of access.
+*************************************************/
+
+#include "Cipher.h"
+
+// Name: Cipher (Default Constructor)
+// Desc - Stores a message that is either read to be encrypted or already encrypted
+Cipher::Cipher() {
+  m_message = "This is default";
+  m_isEncrypted = false;
+}
+
+// Name: Cipher (Overloaded Constructor)
+// Desc - Stores a message that is either read to be encrypted or already encrypted
+Cipher::Cipher(string message, bool encrypted) {
+  m_message = message;
+  m_isEncrypted = encrypted;
+}
+
+// Name: ~Cipher (Destructor)
+// Desc - Virtual destructor
+Cipher::~Cipher() { }
+
+// Name: GetMessage
+// Desc - Returns the message
+string Cipher::GetMessage() {
+  return m_message;
+}
+
+// Name: GetIsEncrypted
+// Desc - Returns isEncrypted (0 is not encrypted and 1 is encrypted)
+bool Cipher::GetIsEncrypted() {
+  return m_isEncrypted;
+}
+
+// Name: SetMessage
+// Desc - Updates a message
+void Cipher::SetMessage(string message) {
+  m_message = message;
+}
+
+// Name: ToggleEncrypted
+// Desc - Turns (true to false) or (false to true)
+void Cipher::ToggleEncrypted() {
+  if (m_isEncrypted)
+    m_isEncrypted = false;
+  else
+    m_isEncrypted = true;
+}
+
+// Name: Overloaded << Operator
+// Desc - Outputs the message
+ostream& operator<<(ostream& output, Cipher& C) {
+  return output << C.GetMessage() << "(" << C.ToString() << ")" << endl;
+}

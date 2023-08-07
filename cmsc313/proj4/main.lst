@@ -1,0 +1,221 @@
+     1                                  ; main file for running game
+     2                                  
+     3                                  ; Declaring needed c functions
+     4                                    extern printf
+     5                                    extern scanf
+     6                                    extern rand_num
+     7                                    extern draw_board
+     8                                  
+     9                                  	section .data
+    10 00000000 57656C636F6D652074-     welcome:     db "Welcome to TIC-TAC-ASSEMBLY", 0              
+    10 00000009 6F205449432D544143-
+    10 00000012 2D415353454D424C59-
+    10 0000001B 00                 
+    11 0000001C 5069636B20616E206F-     options:     db  "Pick an option from the menu below:", 0   
+    11 00000025 7074696F6E2066726F-
+    11 0000002E 6D20746865206D656E-
+    11 00000037 752062656C6F773A00 
+    12 00000040 61202D204561737900      option_a:    db  "a - Easy", 0                              
+    13 00000049 62202D204861726400      option_b:    db  "b - Hard", 0                              
+    14 00000052 71202D205175697400      option_q:    db  "q - Quit", 0
+    15 0000005B 496E707574204100        msg_A        db  "Input A", 0
+    16 00000063 496E707574204200        msg_B        db  "Input B", 0
+    17 0000006B 5175697400              msg_Q        db  "Quit", 0
+    18 00000070 496E76616C69642069-     msg_invalid_input db "Invalid input!", 0           
+    18 00000079 6E7075742100       
+    19 0000007F 25730A00                fmt:         db  "%s", 10, 0                   
+    20 00000083 257300                  fmt_input:   db  "%s", 0
+    21 00000086 25730A00                fmt_output:  db  "%s", 10, 0
+    22 0000008A 25730A00                fmt_invalid_input db "%s", 10, 0
+    23 0000008E 25640A00                fmt_randNum   db "%d", 10, 0
+    24                                  
+    25                                  	section .bss
+    26 00000000 <res 00000002>          char_buff:   resb  2
+    27 00000002 <res 00000001>          num_buff:   resb 1
+    28 00000003 <res 00000018>          board     resq 3
+    29                                  
+    30                                  	section .text
+    31                                  
+    32                                  	global main
+    33                                  
+    34                                  main:
+    35 00000000 E800000000                call get_input
+    36                                  
+    37                                  get_input:
+    38                                    
+    39 00000005 4831FF                    xor rdi, rdi
+    40 00000008 4831F6                    xor rsi, rsi
+    41 0000000B 4831C0                    xor rax, rax
+    42                                  
+    43 0000000E E895000000                call print_welcome
+    44                                  
+    45 00000013 4831FF                    xor rdi, rdi
+    46 00000016 4831F6                    xor rsi, rsi
+    47                                  
+    48                                    ; get user input
+    49 00000019 48BF-                     mov  rdi, fmt_input 
+    49 0000001B [8300000000000000] 
+    50 00000023 48BE-                     mov  rsi, char_buff 
+    50 00000025 [0000000000000000] 
+    51 0000002D B800000000                mov  rax, 0         
+    52 00000032 E8(00000000)              call scanf
+    53                                  
+    54                                    ; checking user input for exit
+    55                                    ; if zero flag is true then exit
+    56                                    ; enter q
+    57 00000037 4831FF                    xor rdi, rdi
+    58 0000003A 4831F6                    xor rsi, rsi
+    59 0000003D 488B3C25[00000000]        mov rdi, [char_buff]
+    60 00000045 BE71000000                mov rsi, "q"
+    61 0000004A 4839F7                    cmp rdi, rsi
+    62 0000004D 0F8468010000              jz  outputQ
+    63                                  
+    64                                    ; enter a
+    65 00000053 4831FF                    xor rdi, rdi
+    66 00000056 4831F6                    xor rsi, rsi
+    67 00000059 488B3C25[00000000]        mov rdi, [char_buff]
+    68 00000061 BE61000000                mov rsi, "a"
+    69 00000066 4839F7                    cmp rdi, rsi
+    70 00000069 0F84BA000000              jz outputA
+    71                                  
+    72                                    ; enter b
+    73 0000006F 4831FF                    xor rdi, rdi
+    74 00000072 4831F6                    xor rsi, rsi
+    75 00000075 488B3C25[00000000]        mov rdi, [char_buff]
+    76 0000007D BE62000000                mov rsi, "b"
+    77 00000082 4839F7                    cmp rdi, rsi
+    78 00000085 0F8407010000              jz outputB
+    79                                  
+    80                                    ; enter anything else
+    81 0000008B 4831FF                    xor rdi, rdi
+    82 0000008E 4831F6                    xor rsi, rsi
+    83 00000091 488B3C25[00000000]        mov rdi, [char_buff]
+    84 00000099 BE63000000                mov rsi, "c"
+    85 0000009E 4839F7                    cmp rdi, rsi
+    86                                    ;jge invalid_input
+    87 000000A1 0F8D5EFFFFFF              jge get_input
+    88                                  
+    89 000000A7 C3                        ret
+    90                                  
+    91                                  print_welcome:
+    92                                     ; print welcome and options
+    93                                    ; clear registers
+    94                                  
+    95 000000A8 55                        push rbp
+    96 000000A9 4831FF                    xor rdi, rdi
+    97 000000AC 4831F6                    xor rsi, rsi
+    98                                  
+    99                                   ; print welcome
+   100 000000AF 48BF-                     mov  rdi, fmt
+   100 000000B1 [7F00000000000000] 
+   101 000000B9 48BE-                     mov  rsi, welcome
+   101 000000BB [0000000000000000] 
+   102 000000C3 B800000000                mov  rax, 0
+   103 000000C8 E8(00000000)              call printf
+   104                                  
+   105                                    ; print option a
+   106 000000CD 48BF-                     mov  rdi, fmt
+   106 000000CF [7F00000000000000] 
+   107 000000D7 48BE-                     mov  rsi, option_a
+   107 000000D9 [4000000000000000] 
+   108 000000E1 B800000000                mov  rax, 0
+   109 000000E6 E8(00000000)              call printf
+   110                                  
+   111                                    ; print option b
+   112 000000EB 48BF-                     mov rdi, fmt
+   112 000000ED [7F00000000000000] 
+   113 000000F5 48BE-                     mov rsi, option_b
+   113 000000F7 [4900000000000000] 
+   114 000000FF B800000000                mov rax, 0
+   115 00000104 E8(00000000)              call printf
+   116                                  
+   117                                    ; print option q
+   118 00000109 48BF-                     mov rdi, fmt
+   118 0000010B [7F00000000000000] 
+   119 00000113 48BE-                     mov rsi, option_q
+   119 00000115 [5200000000000000] 
+   120 0000011D B800000000                mov rax, 0
+   121 00000122 E8(00000000)              call printf
+   122 00000127 5D                        pop rbp
+   123 00000128 C3                        ret
+   124                                  
+   125                                  outputA:
+   126 00000129 4831FF                    xor rdi, rdi
+   127 0000012C 4831F6                    xor rsi, rsi
+   128 0000012F 48BF-                     mov rdi, fmt_output
+   128 00000131 [8600000000000000] 
+   129 00000139 48BE-                     mov rsi, msg_A
+   129 0000013B [5B00000000000000] 
+   130 00000143 B800000000                mov rax, 0
+   131 00000148 E8(00000000)              call printf
+   132                                    
+   133                                    ; rand num
+   134                                    ; just for testing purposes
+   135 0000014D E8(00000000)              call rand_num
+   136 00000152 880425[02000000]          mov [num_buff], byte al
+   137                                  
+   138 00000159 4831FF                    xor rdi, rdi
+   139 0000015C 4831F6                    xor rsi, rsi
+   140 0000015F 48BF-                     mov rdi, fmt_randNum
+   140 00000161 [8E00000000000000] 
+   141 00000169 488B3425[02000000]        mov rsi, [num_buff]
+   142 00000171 B800000000                mov rax, 0
+   143 00000176 E8(00000000)              call printf
+   144                                  
+   145                                  
+   146                                   ; mov [board], byte "x"
+   147                                    ;mov [board + 1], byte "o"
+   148                                  
+   149                                    ; print unedited string
+   150                                  ;	mov 	rax, 1
+   151                                  ;	mov 	rdi, 1
+   152                                  ;	mov 	rsi, board
+   153                                  ;	mov 	rdx, 3
+   154                                  	;syscall
+   155                                  
+   156                                    ;draw_board just for testing purposes
+   157 0000017B 4831FF                    xor rdi, rdi
+   158 0000017E 48BF-                     mov rdi, board
+   158 00000180 [0300000000000000] 
+   159 00000188 E8(00000000)              call draw_board
+   160                                  
+   161                                  
+   162 0000018D E877000000                call exit
+   163                                  
+   164                                  outputB:
+   165 00000192 4831FF                    xor rdi, rdi
+   166 00000195 4831F6                    xor rsi, rsi
+   167 00000198 48BF-                     mov rdi, fmt_output
+   167 0000019A [8600000000000000] 
+   168 000001A2 48BE-                     mov rsi, msg_B
+   168 000001A4 [6300000000000000] 
+   169 000001AC B800000000                mov rax, 0
+   170 000001B1 E8(00000000)              call printf
+   171 000001B6 E84E000000                call exit
+   172                                  
+   173                                  outputQ:
+   174 000001BB 4831FF                    xor rdi, rdi
+   175 000001BE 4831F6                    xor rsi, rsi
+   176 000001C1 48BF-                     mov rdi, fmt_output
+   176 000001C3 [8600000000000000] 
+   177 000001CB 48BE-                     mov rsi, msg_Q
+   177 000001CD [6B00000000000000] 
+   178 000001D5 B800000000                mov rax, 0
+   179 000001DA E8(00000000)              call printf
+   180 000001DF E825000000                call exit
+   181                                  
+   182                                  invalid_input:
+   183 000001E4 4831FF                    xor rdi, rdi
+   184 000001E7 4831F6                    xor rsi, rsi
+   185 000001EA 48BF-                     mov rdi, fmt_invalid_input
+   185 000001EC [8A00000000000000] 
+   186 000001F4 48BE-                     mov rsi, msg_invalid_input
+   186 000001F6 [7000000000000000] 
+   187 000001FE B800000000                mov rax, 0
+   188 00000203 E8(00000000)              call printf
+   189 00000208 C3                        ret
+   190                                  
+   191                                  exit:
+   192 00000209 B83C000000              	mov		rax, 60
+   193 0000020E 4831FF                  	xor		rdi, rdi
+   194 00000211 0F05                    	syscall

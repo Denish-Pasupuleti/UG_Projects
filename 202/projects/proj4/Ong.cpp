@@ -1,0 +1,106 @@
+/*************************************************
+  File: Ong.cpp
+  Project: CMSC 202 Project 4, Spring 2020
+  Author: Denish Pasupuleti
+  Date: 4/20/2020
+  Section: 15
+  E-mail: mpasupu1@umbc.edu
+  Description: This is the cpp file for Ong.h which is a type of cipher
+			   based on vowel and consonants. If consosant then "ong"
+			   is added after it.
+*************************************************/
+
+#include "Ong.h"
+
+//default constructor
+Ong::Ong() { }
+
+//overloaded constructor
+//nothing goes in here because no setters or getters or member variables
+//use initialization lists to pass to Cipher
+Ong::Ong(string message, bool isEncrypted) :Cipher(message, isEncrypted) { }
+
+//Ong (Destructor)
+Ong::~Ong() { }
+
+//Desc: Returns true if vowel, space, or punctuation
+bool Ong::IsVowel(char character) {
+  const char arr[] = { 'a', 'A', 'e', 'E', 'i', 'I', 'o', 'O', 'u', 'U','"',
+		       '(', ')', ',', '.', '[', ']', '{', '}', '|', '\\', '?', '!', ';' };
+  
+  for (char x : arr)
+    if (character == x or character == ' ')
+      return true;
+  return false;
+}
+
+// Desc: If vowel then vowel and dash displayed. dog = dong-o-gong
+// If consonant then consonant and ong and dash displayed.
+void Ong::Encrypt() {
+  string plainText = GetMessage(), cipher = "";
+  char L_MIN = 'a', L_MAX = 'z', U_MIN = 'A', U_MAX = 'Z';
+  
+  for (unsigned int i = 0; i < plainText.length(); i++)
+    {
+      char ch = plainText[i];
+      if (ch == ' ')
+	cipher += " ";
+      else if (!IsVowel(ch) and ((ch >= L_MIN and ch <= L_MAX) or (ch >= U_MIN and ch <= U_MAX)))
+	{
+	  cipher += ch;
+	  cipher += "ong";
+	  if (plainText[i + 1] != ' ')
+	    cipher += "-";
+	}
+      else if (IsVowel(ch))
+	{
+	  cipher += ch;
+	  if (plainText[i + 1] != ' ')
+	    cipher += "-";
+	}
+    }
+  SetMessage(cipher);
+  ToggleEncrypted();
+}
+
+// Desc: Removes the dashes and "ong" when necessary cong-a-tong = cat
+void Ong::Decrypt() {
+  
+  string cipher = GetMessage();
+  string plainText = "";
+  
+  for (unsigned int i = 0; i < cipher.length(); i++)
+    {
+      char ch = cipher[i];
+      if (ch == ' ')
+	plainText += " ";
+      else if (IsVowel(ch))
+	plainText += ch;
+      else if (!IsVowel(ch) and (cipher[i + 1] == 'o' and cipher[i + 2] == 'n' and cipher[i + 3] == 'g'))
+	{
+	  plainText += ch;
+	  i += 3;
+	}
+      else if (ch != '-' and cipher[i + 2] != ' ')
+	{
+	  plainText += ch;
+	}
+    }
+  SetMessage(plainText);
+  ToggleEncrypted();
+}
+
+// Desc - A function that returns the string of the object type
+string Ong::ToString() {
+  return "ong";
+}
+
+// Desc - A function that returns the formatted output for Output function
+// Preconditions - The object exists (use stringstream)
+//Postconditions - o, delimiter, isencrypted, delimiter,
+//                 message, delimiter, blank are output
+string Ong::FormatOutput() {
+  stringstream ss;
+  ss << "o" << "|" << GetIsEncrypted() << "|" << GetMessage() << "|";
+  return ss.str();
+}
